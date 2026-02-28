@@ -21,7 +21,11 @@ export default function HtmlEntityTool() {
 
         try {
             if (mode === 'encode') {
-                setOutput(input.replace(/[\u00A0-\u9999<>&]/g, (i) => '&#' + i.charCodeAt(0) + ';'));
+                // Use named entities for common HTML chars, numeric for extended unicode
+                const named = { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' };
+                setOutput(input.replace(/[<>&"'\u00A0-\u9999]/g, (ch) =>
+                    named[ch] ?? ('&#' + ch.charCodeAt(0) + ';')
+                ));
             } else {
                 const txt = document.createElement("textarea");
                 txt.innerHTML = input;

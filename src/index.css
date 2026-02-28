@@ -156,6 +156,14 @@ body {
   .bg-accent {
     background-color: rgba(255,255,255,0.07) !important;
   }
+  /* hover:bg-accent on icon buttons was resolving to pure white — fix */
+  .hover\:bg-accent:hover {
+    background-color: rgba(255,255,255,0.07) !important;
+  }
+  /* hover:bg-muted/50 used in Base64 dropzone hover */
+  .hover\:bg-muted\/50:hover {
+    background-color: rgba(255,255,255,0.04) !important;
+  }
 
   /* Active sliding pill inside the encode/decode toggle.
      The pill uses bg-background (pure dark) — give it a violet glow instead. */
