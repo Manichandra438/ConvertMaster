@@ -54,7 +54,7 @@ export default function HtmlEntityTool() {
                 keywords="html entity encoder, html entity decoder, html entities, encode html, decode html, escape html, unescape html"
                 canonical="/html"
             />
-            <ToolCard
+            <ToolCard toolId="html"
                 title="HTML Entity Encoder/Decoder"
                 description="Escape special characters to HTML entities or unescape them back to text."
             >

@@ -53,7 +53,7 @@ export default function JsonTool() {
                 keywords="json formatter, json validator, json beautifier, json minifier, format json, validate json, pretty print json"
                 canonical="/json"
             />
-            <ToolCard
+            <ToolCard toolId="json"
                 title="JSON Formatter/Minifier"
                 description="Format JSON with proper indentation or minify it to save space."
             >

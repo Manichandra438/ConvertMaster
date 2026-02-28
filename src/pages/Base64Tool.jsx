@@ -177,7 +177,7 @@ export default function Base64Tool() {
         keywords="base64 encoder, base64 decoder, pdf to base64, base64 to pdf, image to base64, base64 to image, file to base64, base64 converter, base64 encode, base64 decode, encode base64, decode base64"
         canonical="/base64"
       />
-      <ToolCard
+      <ToolCard toolId="base64"
         title="Text & File Encoder / Decoder"
         description="Encode and decode text or files using Base64."
       >

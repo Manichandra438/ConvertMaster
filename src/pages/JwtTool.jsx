@@ -61,7 +61,7 @@ export default function JwtTool() {
                 keywords="jwt decoder, jwt decode, json web token decoder, jwt parser, decode jwt, jwt inspector"
                 canonical="/jwt"
             />
-            <ToolCard
+            <ToolCard toolId="jwt"
                 title="JWT Decoder"
                 description="Decode JSON Web Tokens to view their header and payload."
             >

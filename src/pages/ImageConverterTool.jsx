@@ -175,7 +175,7 @@ export default function ImageConverterTool() {
                 keywords="image converter, png to jpeg, webp converter, tiff converter, batch image convert, grayscale, sepia"
                 canonical="/image-converter"
             />
-            <ToolCard title="Image Converter" description="Convert between PNG, JPEG, WEBP, TIFF, BMP and ICO formats. Apply color effects and convert in batch.">
+            <ToolCard toolId="image-converter" title="Image Converter" description="Convert between PNG, JPEG, WEBP, TIFF, BMP and ICO formats. Apply color effects and convert in batch.">
                 {/* Drop zone */}
                 <div
                     className={cn('ft-dropzone', dragging && 'drag-over')}

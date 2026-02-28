@@ -48,7 +48,7 @@ export default function UrlTool() {
                 keywords="url encoder, url decoder, encode url, decode url, url escape, url unescape, percent encoding, url encoding"
                 canonical="/url"
             />
-            <ToolCard
+            <ToolCard toolId="url"
                 title="URL Encoder/Decoder"
                 description="Encode text to URL-safe format or decode URL-encoded strings."
             >

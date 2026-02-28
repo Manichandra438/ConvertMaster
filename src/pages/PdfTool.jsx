@@ -295,7 +295,7 @@ export default function PdfTool() {
                 keywords="pdf converter, pdf to image, image to pdf, merge pdf, compress pdf, pdf tools"
                 canonical="/pdf-tools"
             />
-            <ToolCard title="PDF Tools" description="Convert, merge, compress PDFs and extract pages — all in your browser.">
+            <ToolCard toolId="pdf-tools" title="PDF Tools" description="Convert, merge, compress PDFs and extract pages — all in your browser.">
                 {/* Tool selector */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                     {Object.entries(TOOL_INFO).map(([key, info]) => (

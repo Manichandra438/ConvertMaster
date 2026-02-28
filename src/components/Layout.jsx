@@ -1,25 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, ChevronDown, Menu, X } from 'lucide-react';
+import { Github, ChevronDown, Menu, X, Zap } from 'lucide-react';
+import { tools, categories, getToolsByCategory } from '../lib/tools';
 
-const devTools = [
-    { path: '/base64',    name: 'Base64',          emoji: '🔢', desc: 'Encode / decode text & files' },
-    { path: '/url',       name: 'URL Encoder',     emoji: '🔗', desc: 'Encode / decode URLs' },
-    { path: '/json',      name: 'JSON Formatter',  emoji: '{ }', desc: 'Format & validate JSON' },
-    { path: '/jwt',       name: 'JWT Decoder',     emoji: '🔑', desc: 'Decode JWT tokens' },
-    { path: '/html',      name: 'HTML Entities',   emoji: '🏷️', desc: 'Encode HTML entities' },
-];
-
-const fileTools = [
-    { path: '/image-converter',  name: 'Image Converter',  emoji: '🖼️', desc: 'Convert between image formats' },
-    { path: '/pdf-tools',        name: 'PDF Tools',         emoji: '📄', desc: 'Convert, merge & compress PDFs' },
-    { path: '/resize-compress',  name: 'Resize & Compress', emoji: '📐', desc: 'Resize or compress images' },
-];
-
-function NavDropdown({ label, items, isOpen, onToggle, onClose }) {
+function ToolsMegaMenu({ isOpen, onClose }) {
     const ref = useRef(null);
     const location = useLocation();
+    const grouped = getToolsByCategory();
 
     useEffect(() => {
         function handleClick(e) { if (ref.current && !ref.current.contains(e.target)) onClose(); }
@@ -30,7 +18,7 @@ function NavDropdown({ label, items, isOpen, onToggle, onClose }) {
     return (
         <div ref={ref} style={{ position: 'relative' }}>
             <button
-                onClick={onToggle}
+                onClick={onClose}
                 style={{
                     display: 'flex', alignItems: 'center', gap: 6,
                     border: 'none', cursor: 'pointer',
@@ -41,7 +29,7 @@ function NavDropdown({ label, items, isOpen, onToggle, onClose }) {
                     background: isOpen ? 'rgba(255,255,255,0.06)' : 'none',
                 }}
             >
-                {label}
+                Tools
                 <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                     <ChevronDown size={14} />
                 </motion.span>
@@ -50,50 +38,79 @@ function NavDropdown({ label, items, isOpen, onToggle, onClose }) {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
                         transition={{ duration: 0.15 }}
                         style={{
                             position: 'absolute', top: 'calc(100% + 10px)', left: '50%',
                             transform: 'translateX(-50%)',
-                            background: 'rgba(10,10,30,0.95)',
+                            background: 'rgba(10,10,30,0.97)',
                             border: '1px solid rgba(255,255,255,0.1)',
                             backdropFilter: 'blur(24px)',
-                            borderRadius: '16px',
-                            padding: '8px',
-                            minWidth: '260px',
+                            borderRadius: '20px',
+                            padding: '16px',
+                            width: '520px',
                             zIndex: 200,
                             boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: '12px',
                         }}
                     >
-                        {items.map((item) => {
-                            const active = location.pathname === item.path;
+                        {Object.entries(grouped).map(([catId, catTools]) => {
+                            const cat = categories[catId];
                             return (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    onClick={onClose}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: 12,
-                                        padding: '10px 14px', borderRadius: '10px',
-                                        textDecoration: 'none',
-                                        background: active ? 'rgba(139,92,246,0.12)' : 'transparent',
-                                        transition: 'background 0.15s',
-                                    }}
-                                    onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                                    onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
-                                >
-                                    <span style={{ fontSize: '1.2rem', width: 28, textAlign: 'center' }}>{item.emoji}</span>
-                                    <div>
-                                        <div style={{
-                                            fontSize: '0.88rem', fontWeight: 600,
-                                            color: active ? '#8B5CF6' : '#F1F0FF',
-                                        }}>{item.name}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'rgba(241,240,255,0.45)', marginTop: 1 }}>{item.desc}</div>
+                                <div key={catId}>
+                                    {/* Category header */}
+                                    <div style={{
+                                        display: 'flex', alignItems: 'center', gap: 8,
+                                        padding: '4px 10px 10px',
+                                        borderBottom: `1px solid ${cat.color}22`,
+                                        marginBottom: 6,
+                                    }}>
+                                        <span style={{ fontSize: '0.95rem' }}>{cat.emoji}</span>
+                                        <span style={{
+                                            fontSize: '0.72rem', fontWeight: 800,
+                                            letterSpacing: '0.1em', textTransform: 'uppercase',
+                                            color: cat.color,
+                                        }}>{cat.label}</span>
                                     </div>
-                                    {active && <span style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: '#8B5CF6', flexShrink: 0 }} />}
-                                </Link>
+                                    {/* Tool links */}
+                                    {catTools.map(tool => {
+                                        const active = location.pathname === tool.path;
+                                        return (
+                                            <Link
+                                                key={tool.path}
+                                                to={tool.path}
+                                                onClick={onClose}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: 10,
+                                                    padding: '9px 10px', borderRadius: '10px',
+                                                    textDecoration: 'none',
+                                                    background: active ? `${tool.color}18` : 'transparent',
+                                                    transition: 'background 0.15s',
+                                                    marginBottom: 2,
+                                                }}
+                                                onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                                                onMouseLeave={e => { if (!active) e.currentTarget.style.background = active ? `${tool.color}18` : 'transparent'; }}
+                                            >
+                                                <span style={{ fontSize: '1.1rem', width: 24, textAlign: 'center', flexShrink: 0 }}>{tool.emoji}</span>
+                                                <div style={{ minWidth: 0 }}>
+                                                    <div style={{
+                                                        fontSize: '0.85rem', fontWeight: 600,
+                                                        color: active ? tool.color : '#F1F0FF',
+                                                        display: 'flex', alignItems: 'center', gap: 6,
+                                                    }}>
+                                                        {tool.name}
+                                                        {active && <span style={{ width: 5, height: 5, borderRadius: '50%', background: tool.color, flexShrink: 0, display: 'inline-block' }} />}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.72rem', color: 'rgba(241,240,255,0.4)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tool.desc}</div>
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
                             );
                         })}
                     </motion.div>
@@ -104,12 +121,16 @@ function NavDropdown({ label, items, isOpen, onToggle, onClose }) {
 }
 
 export default function Layout({ children }) {
-    const [openMenu, setOpenMenu] = useState(null); // 'dev' | 'file' | null
+    const [megaOpen, setMegaOpen] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const location = useLocation();
-    const navigate = useNavigate();
+    const grouped = getToolsByCategory();
 
-    const toggle = (menu) => setOpenMenu(prev => prev === menu ? null : menu);
+    // Close menus on navigation
+    useEffect(() => {
+        setMegaOpen(false);
+        setMobileOpen(false);
+    }, [location.pathname]);
 
     return (
         <div style={{ minHeight: '100vh', position: 'relative' }}>
@@ -140,19 +161,19 @@ export default function Layout({ children }) {
                     </motion.span>
                 </Link>
 
-                {/* Desktop nav */}
+                {/* Desktop nav — single Tools mega-menu */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }} className="hidden-mobile">
-                    <NavDropdown label="Dev Tools" items={devTools} isOpen={openMenu === 'dev'} onToggle={() => toggle('dev')} onClose={() => setOpenMenu(null)} />
-                    <NavDropdown label="File Tools" items={fileTools} isOpen={openMenu === 'file'} onToggle={() => toggle('file')} onClose={() => setOpenMenu(null)} />
+                    <ToolsMegaMenu isOpen={megaOpen} onClose={() => setMegaOpen(p => !p)} />
                 </div>
 
                 {/* Right side */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <motion.a
-                        href="https://github.com/Manichandra438"
+                        href="https://github.com/Manichandra438/ConvertMaster"
                         target="_blank" rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
                         style={{ color: 'rgba(241,240,255,0.6)', display: 'flex', alignItems: 'center' }}
+                        title="View on GitHub"
                     >
                         <Github size={20} />
                     </motion.a>
@@ -178,27 +199,41 @@ export default function Layout({ children }) {
                         style={{
                             position: 'fixed', top: 64, left: 0, right: 0, zIndex: 99,
                             background: 'rgba(6,6,26,0.97)',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderBottom: '1px solid rgba(255,255,255,0.08)',
                             backdropFilter: 'blur(20px)',
-                            padding: '16px',
+                            padding: '12px 16px 20px',
                             maxHeight: 'calc(100vh - 64px)',
                             overflowY: 'auto',
                         }}
                     >
-                        <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(241,240,255,0.4)', padding: '8px 12px 4px' }}>Dev Tools</div>
-                        {devTools.map(item => (
-                            <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}
-                                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: '10px', textDecoration: 'none', color: location.pathname === item.path ? '#8B5CF6' : '#F1F0FF' }}>
-                                <span>{item.emoji}</span><span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{item.name}</span>
-                            </Link>
-                        ))}
-                        <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(241,240,255,0.4)', padding: '14px 12px 4px' }}>File Tools</div>
-                        {fileTools.map(item => (
-                            <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}
-                                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: '10px', textDecoration: 'none', color: location.pathname === item.path ? '#8B5CF6' : '#F1F0FF' }}>
-                                <span>{item.emoji}</span><span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{item.name}</span>
-                            </Link>
-                        ))}
+                        {Object.entries(grouped).map(([catId, catTools]) => {
+                            const cat = categories[catId];
+                            return (
+                                <div key={catId} style={{ marginBottom: 16 }}>
+                                    <div style={{
+                                        display: 'flex', alignItems: 'center', gap: 6,
+                                        fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em',
+                                        textTransform: 'uppercase', color: cat.color,
+                                        padding: '8px 12px 6px',
+                                    }}>
+                                        {cat.emoji} {cat.label}
+                                    </div>
+                                    {catTools.map(tool => (
+                                        <Link key={tool.path} to={tool.path} onClick={() => setMobileOpen(false)}
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: 12,
+                                                padding: '10px 12px', borderRadius: '10px',
+                                                textDecoration: 'none',
+                                                color: location.pathname === tool.path ? tool.color : '#F1F0FF',
+                                                background: location.pathname === tool.path ? `${tool.color}12` : 'transparent',
+                                            }}>
+                                            <span>{tool.emoji}</span>
+                                            <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{tool.name}</span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            );
+                        })}
                     </motion.div>
                 )}
             </AnimatePresence>

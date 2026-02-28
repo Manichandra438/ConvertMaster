@@ -187,7 +187,7 @@ export default function ResizeCompressTool() {
                 keywords="resize image, compress image, image optimizer, reduce image size, scale image"
                 canonical="/resize-compress"
             />
-            <ToolCard title="Resize & Compress" description="Resize images to exact dimensions, scale by percent, or compress to a target file size.">
+            <ToolCard toolId="resize-compress" title="Resize & Compress" description="Resize images to exact dimensions, scale by percent, or compress to a target file size.">
                 {/* Drop zone */}
                 <div
                     className={cn('ft-dropzone', dragging && 'drag-over')}

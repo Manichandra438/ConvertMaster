@@ -1,7 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { tools, categories, getRelatedTools } from '../lib/tools';
 
-export default function ToolCard({ title, description, children }) {
+export default function ToolCard({ title, description, toolId, children }) {
+    const related = toolId ? getRelatedTools(toolId) : [];
+    const currentTool = toolId ? tools.find(t => t.id === toolId) : null;
+    const cat = currentTool ? categories[currentTool.category] : null;
     return (
         <div className="tool-page">
         <motion.div
@@ -57,6 +62,39 @@ export default function ToolCard({ title, description, children }) {
             >
                 {children}
             </motion.div>
+
+            {/* Related tools strip */}
+            {related.length > 0 && cat && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    style={{
+                        padding: '14px 32px',
+                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                        background: 'rgba(0,0,0,0.12)',
+                        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+                    }}
+                >
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: cat.color, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
+                        {cat.emoji} More in {cat.label}:
+                    </span>
+                    {related.map(t => (
+                        <Link key={t.id} to={t.path} style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            padding: '3px 12px', borderRadius: '50px',
+                            background: `${t.color}14`, border: `1px solid ${t.color}30`,
+                            color: t.color, fontSize: '0.75rem', fontWeight: 600,
+                            textDecoration: 'none', transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = `${t.color}28`}
+                        onMouseLeave={e => e.currentTarget.style.background = `${t.color}14`}
+                        >
+                            {t.emoji} {t.name}
+                        </Link>
+                    ))}
+                </motion.div>
+            )}
         </motion.div>
         </div>
     );
