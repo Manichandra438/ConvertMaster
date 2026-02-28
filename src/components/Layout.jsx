@@ -142,7 +142,7 @@ function SideDrawer({ isOpen, onClose }) {
                             flexShrink: 0,
                         }}>
                             <a
-                                href="https://github.com/Manichandra438/ConvertMaster"
+                                href="https://github.com/Manichandra438"
                                 target="_blank" rel="noopener noreferrer"
                                 style={{
                                     display: 'flex', alignItems: 'center', gap: 10,
@@ -200,11 +200,11 @@ export default function Layout({ children }) {
                 {/* Right side: GitHub + burger */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <motion.a
-                        href="https://github.com/Manichandra438/ConvertMaster"
+                        href="https://github.com/Manichandra438"
                         target="_blank" rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
                         style={{ color: 'rgba(241,240,255,0.5)', display: 'flex', alignItems: 'center', padding: 6 }}
-                        title="View on GitHub"
+                        title="View GitHub"
                     >
                         <Github size={19} />
                     </motion.a>
