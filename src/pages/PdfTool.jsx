@@ -6,7 +6,6 @@ import * as pdfjsLib from 'pdfjs-dist';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
-import '../styles/file-tools.css';
 
 // Configure pdfjs worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(

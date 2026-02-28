@@ -4,7 +4,6 @@ import { Trash2, Download, X, Image as ImageIcon } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
-import '../styles/file-tools.css';
 
 // ── helpers ──────────────────────────────────────────────────
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
