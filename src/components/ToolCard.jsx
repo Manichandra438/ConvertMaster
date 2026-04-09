@@ -7,95 +7,116 @@ export default function ToolCard({ title, description, toolId, children }) {
     const related = toolId ? getRelatedTools(toolId) : [];
     const currentTool = toolId ? tools.find(t => t.id === toolId) : null;
     const cat = currentTool ? categories[currentTool.category] : null;
+
     return (
         <div className="tool-page">
-        <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.09)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                borderRadius: '28px',
-                overflow: 'hidden',
-                boxShadow: '0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
-            }}
-        >
-            {/* Header */}
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.15 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
                 style={{
-                    padding: '28px 32px 24px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
-                    background: 'rgba(0,0,0,0.15)',
+                    background: 'var(--panel-bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    overflow: 'hidden',
                 }}
             >
-                <h2 style={{
-                    fontFamily: 'Syne, system-ui, sans-serif',
-                    fontSize: '1.35rem',
-                    fontWeight: 800,
-                    letterSpacing: '-0.02em',
-                    background: 'linear-gradient(135deg, #8B5CF6, #22D3EE)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
+                {/* Header */}
+                <div style={{
+                    padding: '12px 16px',
+                    borderBottom: '1px solid var(--border)',
+                    background: 'var(--titlebar-bg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                 }}>
-                    {title}
-                </h2>
+                    {/* Breadcrumb */}
+                    <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>ConvertMaster</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>/</span>
+                    {cat && (
+                        <>
+                            <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>{cat.label}</span>
+                            <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>/</span>
+                        </>
+                    )}
+                    <span style={{ fontSize: '12px', color: 'var(--text)', fontWeight: 500 }}>
+                        {currentTool ? `${currentTool.emoji} ${title}` : title}
+                    </span>
+                </div>
+
+                {/* Description bar */}
                 {description && (
-                    <p style={{ color: 'rgba(241,240,255,0.5)', fontSize: '0.88rem', marginTop: '6px', lineHeight: 1.5 }}>
+                    <div style={{
+                        padding: '8px 16px',
+                        borderBottom: '1px solid var(--border)',
+                        background: 'var(--sidebar-bg)',
+                        fontSize: '12px',
+                        color: 'var(--text-dim)',
+                        lineHeight: 1.5,
+                    }}>
                         {description}
-                    </p>
+                    </div>
+                )}
+
+                {/* Body */}
+                <div style={{ padding: '20px 20px' }}>
+                    {children}
+                </div>
+
+                {/* Related tools */}
+                {related.length > 0 && cat && (
+                    <div style={{
+                        padding: '10px 16px',
+                        borderTop: '1px solid var(--border)',
+                        background: 'var(--sidebar-bg)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        fontSize: '11px',
+                    }}>
+                        <span style={{
+                            color: 'var(--text-dim)',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.06em',
+                            flexShrink: 0,
+                        }}>
+                            More in {cat.label}:
+                        </span>
+                        {related.map(t => (
+                            <Link
+                                key={t.id}
+                                to={t.path}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    padding: '3px 8px',
+                                    borderRadius: 'var(--radius)',
+                                    background: 'transparent',
+                                    border: '1px solid var(--border)',
+                                    color: 'var(--text-dim)',
+                                    textDecoration: 'none',
+                                    transition: 'border-color 0.1s, color 0.1s, background 0.1s',
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.borderColor = 'var(--accent)';
+                                    e.currentTarget.style.color = 'var(--accent)';
+                                    e.currentTarget.style.background = 'rgba(0,122,204,0.1)';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.borderColor = 'var(--border)';
+                                    e.currentTarget.style.color = 'var(--text-dim)';
+                                    e.currentTarget.style.background = 'transparent';
+                                }}
+                            >
+                                {t.emoji} {t.name}
+                            </Link>
+                        ))}
+                    </div>
                 )}
             </motion.div>
-
-            {/* Body */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.25 }}
-                style={{ padding: '32px' }}
-            >
-                {children}
-            </motion.div>
-
-            {/* Related tools strip */}
-            {related.length > 0 && cat && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    style={{
-                        padding: '14px 32px',
-                        borderTop: '1px solid rgba(255,255,255,0.06)',
-                        background: 'rgba(0,0,0,0.12)',
-                        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-                    }}
-                >
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: cat.color, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
-                        {cat.emoji} More in {cat.label}:
-                    </span>
-                    {related.map(t => (
-                        <Link key={t.id} to={t.path} style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 5,
-                            padding: '3px 12px', borderRadius: '50px',
-                            background: `${t.color}14`, border: `1px solid ${t.color}30`,
-                            color: t.color, fontSize: '0.75rem', fontWeight: 600,
-                            textDecoration: 'none', transition: 'background 0.15s',
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.background = `${t.color}28`}
-                        onMouseLeave={e => e.currentTarget.style.background = `${t.color}14`}
-                        >
-                            {t.emoji} {t.name}
-                        </Link>
-                    ))}
-                </motion.div>
-            )}
-        </motion.div>
         </div>
     );
 }
