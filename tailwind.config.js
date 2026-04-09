@@ -7,56 +7,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Shapeshft palette
-        violet:  '#8B5CF6',
-        cyan:    '#22D3EE',
-        pink:    '#F472B6',
-        emerald: '#34D399',
-        // Semantic aliases — use rgb channel format so Tailwind opacity modifiers work
-        // e.g. bg-primary/5, bg-muted/50, bg-destructive/10
-        border:      'rgba(255,255,255,0.09)',
-        input:       'rgba(255,255,255,0.09)',
-        ring:        'rgb(139 92 246 / <alpha-value>)',
-        background:  '#06061a',
-        foreground:  '#F1F0FF',
+        // VS Code Dark+ palette
+        border:      '#3c3c3c',
+        input:       '#3c3c3c',
+        ring:        'rgb(0 122 204 / <alpha-value>)',
+        background:  '#1e1e1e',
+        foreground:  '#d4d4d4',
         primary: {
-          DEFAULT:    'rgb(139 92 246 / <alpha-value>)',
-          foreground: '#F1F0FF',
+          DEFAULT:    'rgb(0 122 204 / <alpha-value>)',
+          foreground: '#ffffff',
         },
         secondary: {
-          DEFAULT:    'rgb(255 255 255 / <alpha-value>)',
-          foreground: '#F1F0FF',
+          DEFAULT:    'rgb(45 45 45 / <alpha-value>)',
+          foreground: '#d4d4d4',
         },
         destructive: {
-          DEFAULT:    'rgb(244 63 94 / <alpha-value>)',
-          foreground: '#F1F0FF',
+          DEFAULT:    'rgb(244 71 71 / <alpha-value>)',
+          foreground: '#ffffff',
         },
         muted: {
-          DEFAULT:    'rgb(255 255 255 / <alpha-value>)',
-          foreground: 'rgba(241,240,255,0.45)',
+          DEFAULT:    'rgb(45 45 45 / <alpha-value>)',
+          foreground: '#808080',
         },
         accent: {
-          DEFAULT:    'rgb(255 255 255 / <alpha-value>)',
-          foreground: '#F1F0FF',
+          DEFAULT:    'rgb(42 45 46 / <alpha-value>)',
+          foreground: '#d4d4d4',
         },
         card: {
-          DEFAULT:    '#06061a',
-          foreground: '#F1F0FF',
+          DEFAULT:    '#252526',
+          foreground: '#d4d4d4',
         },
       },
       borderRadius: {
-        lg:  '20px',
-        md:  '14px',
-        sm:  '12px',
-        xl:  '24px',
-        '2xl': '28px',
+        lg:    '6px',
+        md:    '4px',
+        sm:    '3px',
+        xl:    '8px',
+        '2xl': '10px',
       },
       fontFamily: {
-        sans:    ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        display: ['Syne', 'system-ui', 'sans-serif'],
-      },
-      backdropBlur: {
-        glass: '16px',
+        sans: ['-apple-system', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        mono: ['"Cascadia Code"', '"JetBrains Mono"', '"Fira Code"', 'Consolas', 'monospace'],
       },
     },
   },
