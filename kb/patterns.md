@@ -1,7 +1,7 @@
 ---
 project: ConvertMaster
 confidence: medium
-last-verified: 2026-07-12
+last-verified: 2026-07-12 (23:10 update)
 status: active
 ---
 
@@ -21,14 +21,16 @@ status: active
 
 ## Common patterns in this codebase
 - **Live conversion via useEffect**: text tools (Base64, presumably URL/JSON/JWT/HTML) recompute output in a `useEffect([input, mode])`, catch errors into a local error state, no debounce.
-- **File queue pattern** (ImageConverterTool, PdfTool): `files` state array of `{ id, file, status: 'ready'|'working'|'done'|'error', result }`, sequential `for` loop with `await sleep(N)` between items to let UI repaint progress %, `setFiles([...updated])` after each mutation (no functional batching).
-- **Download trigger**: `triggerDownload(blob, name)` helper — creates object URL, synthetic `<a>` click, revokes URL after 1s timeout. Duplicated per-file (not extracted to `lib/`) — same function body copy-pasted in ImageConverterTool.jsx and PdfTool.jsx.
-- **Copy-to-clipboard**: `navigator.clipboard.writeText`, sets `copied` state to an id string, `setTimeout(() => setCopied(null), 2000)`, AnimatePresence swaps Copy/Check icon.
+- **File queue pattern** (ImageConverterTool, PdfTool, ResizeCompressTool): `files` state array of `{ id, file, status: 'ready'|'working'|'done'|'error', result }`, sequential `for` loop with `await sleep(N)` between items to let UI repaint progress %, `setFiles([...updated])` after each mutation (no functional batching).
+- **Download trigger**: `triggerDownload(blob, name)` from `src/lib/fileHelpers.js` — creates object URL, synthetic `<a>` click, revokes URL after 1s timeout. As of 2026-07-12 this is a shared import, not duplicated — always import from `fileHelpers.js`, never redefine locally.
+- **Copy-to-clipboard**: `useCopy()` hook from `src/lib/useCopy.js` — returns `{ copied, copy }`. `copy(text, id)` writes to clipboard, sets `copied` to the id, resets after 2s. AnimatePresence swaps Copy/Check icon based on `copied === id`. As of 2026-07-12 this is shared, not duplicated — always use the hook, never redefine `handleCopy` locally.
 - **Canvas-based image processing**: draw to offscreen `<canvas>`, optional pixel manipulation (`applyGrayscale`/`applySepia` in ImageConverterTool), `canvas.toBlob(cb, mimeType, quality)`.
 - **PDF page rendering**: `pdfjsLib.getDocument({data}).promise` → `pdf.getPage(n)` → `page.getViewport({scale})` → render to canvas → `canvas.toBlob`.
+- **Pure-logic extraction for testability**: when a component has a genuinely pure function (no DOM/canvas dependency — e.g. byte-sniffing, string parsing, dimension math), pull it into `src/lib/{name}.js` with a matching `{name}.test.js`, then import it back into the component. Don't extract functions that are inherently DOM-coupled (e.g. the canvas-drawing parts of `resizeImage` stay in the component; only the width/height math moved to `lib/resize.js`).
+- **Keyboard-accessible dropzones**: file-upload dropzones use `role="button" tabIndex={0}` + `onKeyDown` handling Enter/Space (in addition to `onClick`) so keyboard-only users can open the file picker. Added 2026-07-12 — any new dropzone should follow this from the start, not just `onClick`.
 
 ## Testing approach
-No test files found in the repo (no `*.test.*`/`*.spec.*`, no test runner in package.json). Verification is manual/visual only.
+Vitest (`npm run test` → `vitest run`), added 2026-07-12. Only pure `src/lib/*.js` functions have tests so far (`mime.test.js`, `jwt.test.js`, `resize.test.js`, `fileHelpers.test.js` — 20 tests total). No component/integration tests yet — UI behavior is still verified manually/visually (or via live browser-driving, see the project's `.claude/skills/verify/SKILL.md`).
 
 ## Cross-links
 [[architecture]], [[anti-patterns]]

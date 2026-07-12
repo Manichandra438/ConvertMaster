@@ -1,50 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Trash2, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { useCopy } from '../lib/useCopy';
 
 export default function HtmlEntityTool() {
     const [input, setInput] = useState('');
-    const [output, setOutput] = useState('');
     const [mode, setMode] = useState('encode'); // 'encode' or 'decode'
-    const [error, setError] = useState(null);
-    const [copied, setCopied] = useState(null);
+    const { copied, copy: handleCopy } = useCopy();
 
-    useEffect(() => {
-        setError(null);
-        if (!input) {
-            setOutput('');
-            return;
-        }
-
+    const { output, error } = useMemo(() => {
+        if (!input) return { output: '', error: null };
         try {
             if (mode === 'encode') {
                 // Use named entities for common HTML chars, numeric for extended unicode
                 const named = { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' };
-                setOutput(input.replace(/[<>&"'\u00A0-\u9999]/g, (ch) =>
+                const result = input.replace(/[<>&"'\u00A0-\u9999]/g, (ch) =>
                     named[ch] ?? ('&#' + ch.charCodeAt(0) + ';')
-                ));
-            } else {
-                const txt = document.createElement("textarea");
-                txt.innerHTML = input;
-                setOutput(txt.value);
+                );
+                return { output: result, error: null };
             }
+            const txt = document.createElement("textarea");
+            txt.innerHTML = input;
+            return { output: txt.value, error: null };
         } catch (err) {
-            setError('Invalid input for ' + mode);
+            console.error('HTML entity ' + mode + ' failed:', err);
+            return { output: '', error: 'Invalid input for ' + mode };
         }
     }, [input, mode]);
-
-    const handleCopy = async (text, id) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(id);
-            setTimeout(() => setCopied(null), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
 
     return (
         <>
@@ -115,6 +100,7 @@ export default function HtmlEntityTool() {
                                         onClick={() => setInput('')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Clear"
+                                        aria-label="Clear"
                                     >
                                         <Trash2 size={16} />
                                     </motion.button>
@@ -124,6 +110,7 @@ export default function HtmlEntityTool() {
                                         onClick={() => handleCopy(input, 'input')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'input' ? (
@@ -167,6 +154,7 @@ export default function HtmlEntityTool() {
                                         onClick={() => handleCopy(output, 'output')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'output' ? (

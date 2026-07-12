@@ -1,7 +1,7 @@
 ---
 project: ConvertMaster
 created: 2026-07-12
-last-updated: 2026-07-12
+last-updated: 2026-07-12 (23:10)
 ---
 
 # Brain Index — ConvertMaster
@@ -20,6 +20,8 @@ last-updated: 2026-07-12
 | [domains/](domains/) | Business rules and domain knowledge | active |
 | [decisions/](decisions/) | Architecture decisions (ADRs) | active |
 | [sessions/](sessions/) | Session brain dumps | active |
+| [reports/](reports/) | /guideline-review findings reports | active |
+| [guidelines/](guidelines/) | ENGINEERING_GUIDELINES.md source doc | active |
 
 ## Cross-links
 None yet.

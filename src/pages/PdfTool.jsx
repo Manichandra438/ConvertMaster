@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Download, X, FileText, RefreshCw } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
@@ -6,6 +6,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { sleep, formatBytes, triggerDownload } from '../lib/fileHelpers';
 
 // Configure pdfjs worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -14,21 +15,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 // ── helpers ──────────────────────────────────────────────────
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function formatBytes(b) {
-    if (b < 1024) return b + ' B';
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-    return (b / 1024 / 1024).toFixed(2) + ' MB';
-}
-
-function triggerDownload(blob, name) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none'; a.href = url; a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
-}
+const PAGE_SIZES = { a4: [595, 842], letter: [612, 792] }; // PDF points (1/72")
 
 async function imageToJpeg(file) {
     const url = await new Promise((res, rej) => {
@@ -118,7 +105,7 @@ export default function PdfTool() {
     // ── Tool runners ──
     const runImagesToPdf = async (fileItems) => {
         const pdfDoc = await PDFDocument.create();
-        const [pw, ph] = pageSize === 'a4' ? [595, 842] : pageSize === 'letter' ? [612, 792] : [0, 0];
+        const [pw, ph] = PAGE_SIZES[pageSize] || [0, 0];
 
         for (let i = 0; i < fileItems.length; i++) {
             setProgress(Math.round((i / fileItems.length) * 90));
@@ -318,6 +305,10 @@ export default function PdfTool() {
                     onDragLeave={() => setDragging(false)}
                     onDrop={handleDrop}
                     onClick={() => inputRef.current?.click()}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Choose files to upload"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
                 >
                     <input ref={inputRef} type="file" accept={toolInfo.accept} multiple onChange={(e) => addFiles(e.target.files)} />
                     <div className="text-4xl mb-3">{toolInfo.icon}</div>
@@ -381,11 +372,11 @@ export default function PdfTool() {
                                         item.status === 'error' && 'ft-status-error',
                                     )}>{item.status}</span>
                                     {item.result && (
-                                        <button onClick={() => triggerDownload(item.result, `compressed_${item.file.name}`)} className="p-1.5 hover:bg-accent rounded-md">
+                                        <button onClick={() => triggerDownload(item.result, `compressed_${item.file.name}`)} className="p-1.5 hover:bg-accent rounded-md" title="Download" aria-label="Download">
                                             <Download size={16} />
                                         </button>
                                     )}
-                                    <button onClick={() => removeFile(item.id)} className="p-1.5 hover:bg-accent rounded-md text-muted-foreground">
+                                    <button onClick={() => removeFile(item.id)} className="p-1.5 hover:bg-accent rounded-md text-muted-foreground" title="Remove" aria-label="Remove">
                                         <X size={16} />
                                     </button>
                                 </div>

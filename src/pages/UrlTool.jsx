@@ -1,44 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Trash2, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { useCopy } from '../lib/useCopy';
 
 export default function UrlTool() {
     const [input, setInput] = useState('');
-    const [output, setOutput] = useState('');
     const [mode, setMode] = useState('encode'); // 'encode' or 'decode'
-    const [error, setError] = useState(null);
-    const [copied, setCopied] = useState(null);
+    const { copied, copy: handleCopy } = useCopy();
 
-    useEffect(() => {
-        setError(null);
-        if (!input) {
-            setOutput('');
-            return;
-        }
-
+    const { output, error } = useMemo(() => {
+        if (!input) return { output: '', error: null };
         try {
-            if (mode === 'encode') {
-                setOutput(encodeURIComponent(input));
-            } else {
-                setOutput(decodeURIComponent(input));
-            }
+            const result = mode === 'encode' ? encodeURIComponent(input) : decodeURIComponent(input);
+            return { output: result, error: null };
         } catch (err) {
-            setError('Invalid input for ' + mode);
+            console.error('URL ' + mode + ' failed:', err);
+            return { output: '', error: 'Invalid input for ' + mode };
         }
     }, [input, mode]);
-
-    const handleCopy = async (text, id) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(id);
-            setTimeout(() => setCopied(null), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
 
     return (
         <>
@@ -109,6 +91,7 @@ export default function UrlTool() {
                                         onClick={() => setInput('')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Clear"
+                                        aria-label="Clear"
                                     >
                                         <Trash2 size={16} />
                                     </motion.button>
@@ -118,6 +101,7 @@ export default function UrlTool() {
                                         onClick={() => handleCopy(input, 'input')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'input' ? (
@@ -161,6 +145,7 @@ export default function UrlTool() {
                                         onClick={() => handleCopy(output, 'output')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'output' ? (
