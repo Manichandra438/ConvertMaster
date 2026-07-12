@@ -1,21 +1,32 @@
 # ConvertMaster
 
-To access the site, visit:  
-[https://manichandra438.github.io/ConvertMaster](https://manichandra438.github.io/ConvertMaster)
+A collection of browser-only developer tools — Base64, URL, JSON, JWT, and HTML entity encoding/decoding, plus image conversion, PDF tools, and image resize/compress. Everything runs client-side; no files are ever uploaded to a server.
 
-# React + Vite
+Live site: [https://manichandra438.github.io/ConvertMaster](https://manichandra438.github.io/ConvertMaster)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Setup
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Open the printed local URL in your browser.
 
-## React Compiler
+## Scripts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the Vite dev server with hot reload |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint over the codebase |
+| `npm run test` | Run the Vitest unit test suite |
 
-## Expanding the ESLint configuration
+## Configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+No environment variables or secrets are required — it's a static client-side app. App-wide toggles (e.g. the walking-characters easter egg) live in `src/config.js`.
+
+## Stack
+
+React 19 + Vite 7 + React Router + Tailwind CSS + framer-motion, with `pdf-lib`/`pdfjs-dist` for PDF handling.

@@ -4,13 +4,15 @@ import { Copy, Trash2, AlertTriangle, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { useCopy } from '../lib/useCopy';
+import { decodeJwtPart } from '../lib/jwt';
 
 export default function JwtTool() {
     const [input, setInput] = useState('');
     const [header, setHeader] = useState('');
     const [payload, setPayload] = useState('');
     const [error, setError] = useState(null);
-    const [copied, setCopied] = useState(null);
+    const { copied, copy: handleCopy } = useCopy();
 
     useEffect(() => {
         setError(null);
@@ -26,32 +28,14 @@ export default function JwtTool() {
                 throw new Error('Invalid JWT format (must have 3 parts separated by dots)');
             }
 
-            const decodePart = (part) => {
-                try {
-                    return JSON.stringify(JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))), null, 2);
-                } catch (e) {
-                    throw new Error('Failed to decode part');
-                }
-            };
-
-            setHeader(decodePart(parts[0]));
-            setPayload(decodePart(parts[1]));
+            setHeader(decodeJwtPart(parts[0]));
+            setPayload(decodeJwtPart(parts[1]));
         } catch (err) {
             setError(err.message);
             setHeader('');
             setPayload('');
         }
     }, [input]);
-
-    const handleCopy = async (text, id) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(id);
-            setTimeout(() => setCopied(null), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
 
     return (
         <>
@@ -81,6 +65,7 @@ export default function JwtTool() {
                                     onClick={() => setInput('')}
                                     className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                     title="Clear"
+                                    aria-label="Clear"
                                 >
                                     <Trash2 size={16} />
                                 </motion.button>
@@ -90,6 +75,7 @@ export default function JwtTool() {
                                     onClick={() => handleCopy(input, 'input')}
                                     className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                     title="Copy"
+                                    aria-label="Copy"
                                 >
                                     <AnimatePresence mode="wait">
                                         {copied === 'input' ? (
@@ -149,6 +135,7 @@ export default function JwtTool() {
                                     onClick={() => handleCopy(header, 'header')}
                                     className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                     title="Copy"
+                                    aria-label="Copy"
                                 >
                                     <AnimatePresence mode="wait">
                                         {copied === 'header' ? (
@@ -190,6 +177,7 @@ export default function JwtTool() {
                                     onClick={() => handleCopy(payload, 'payload')}
                                     className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                     title="Copy"
+                                    aria-label="Copy"
                                 >
                                     <AnimatePresence mode="wait">
                                         {copied === 'payload' ? (

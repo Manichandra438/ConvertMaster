@@ -4,16 +4,9 @@ import { Trash2, Download, X, Image as ImageIcon } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { sleep, formatBytes, triggerDownload } from '../lib/fileHelpers';
 
 // ── helpers ──────────────────────────────────────────────────
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function formatBytes(b) {
-    if (b < 1024) return b + ' B';
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-    return (b / 1024 / 1024).toFixed(2) + ' MB';
-}
-
 function readFileAsDataUrl(file) {
     return new Promise((res, rej) => {
         const reader = new FileReader();
@@ -79,14 +72,6 @@ const FORMAT_EXT = {
     'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp',
     'image/bmp': 'bmp', tiff: 'tiff', ico: 'ico',
 };
-
-function triggerDownload(blob, name) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none'; a.href = url; a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
-}
 
 // ── Component ────────────────────────────────────────────────
 export default function ImageConverterTool() {
@@ -183,6 +168,10 @@ export default function ImageConverterTool() {
                     onDragLeave={() => setDragging(false)}
                     onDrop={handleDrop}
                     onClick={() => inputRef.current?.click()}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Choose images to upload"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
                 >
                     <input ref={inputRef} type="file" accept="image/*" multiple onChange={(e) => addFiles(e.target.files)} />
                     <div className="text-4xl mb-3">☁️</div>
@@ -240,11 +229,11 @@ export default function ImageConverterTool() {
                                         item.status === 'error'   && 'ft-status-error',
                                     )}>{item.status}</span>
                                     {item.result && (
-                                        <button onClick={() => downloadSingle(item)} className="p-1.5 hover:bg-accent rounded-md" title="Download">
+                                        <button onClick={() => downloadSingle(item)} className="p-1.5 hover:bg-accent rounded-md" title="Download" aria-label="Download">
                                             <Download size={16} />
                                         </button>
                                     )}
-                                    <button onClick={() => removeFile(item.id)} className="p-1.5 hover:bg-accent rounded-md text-muted-foreground" title="Remove">
+                                    <button onClick={() => removeFile(item.id)} className="p-1.5 hover:bg-accent rounded-md text-muted-foreground" title="Remove" aria-label="Remove">
                                         <X size={16} />
                                     </button>
                                 </div>

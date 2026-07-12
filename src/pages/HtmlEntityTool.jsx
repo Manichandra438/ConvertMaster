@@ -4,13 +4,14 @@ import { Copy, Trash2, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { useCopy } from '../lib/useCopy';
 
 export default function HtmlEntityTool() {
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
     const [mode, setMode] = useState('encode'); // 'encode' or 'decode'
     const [error, setError] = useState(null);
-    const [copied, setCopied] = useState(null);
+    const { copied, copy: handleCopy } = useCopy();
 
     useEffect(() => {
         setError(null);
@@ -35,16 +36,6 @@ export default function HtmlEntityTool() {
             setError('Invalid input for ' + mode);
         }
     }, [input, mode]);
-
-    const handleCopy = async (text, id) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(id);
-            setTimeout(() => setCopied(null), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
 
     return (
         <>
@@ -115,6 +106,7 @@ export default function HtmlEntityTool() {
                                         onClick={() => setInput('')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Clear"
+                                        aria-label="Clear"
                                     >
                                         <Trash2 size={16} />
                                     </motion.button>
@@ -124,6 +116,7 @@ export default function HtmlEntityTool() {
                                         onClick={() => handleCopy(input, 'input')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'input' ? (
@@ -167,6 +160,7 @@ export default function HtmlEntityTool() {
                                         onClick={() => handleCopy(output, 'output')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'output' ? (

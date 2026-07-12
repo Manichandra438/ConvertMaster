@@ -4,13 +4,14 @@ import { Copy, Trash2, Minimize2, Maximize2, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { useCopy } from '../lib/useCopy';
 
 export default function JsonTool() {
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
     const [error, setError] = useState(null);
     const [indentSize, setIndentSize] = useState(2);
-    const [copied, setCopied] = useState(null);
+    const { copied, copy: handleCopy } = useCopy();
 
     useEffect(() => {
         setError(null);
@@ -26,16 +27,6 @@ export default function JsonTool() {
             setError(err.message);
         }
     }, [input, indentSize]);
-
-    const handleCopy = async (text, id) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(id);
-            setTimeout(() => setCopied(null), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
 
     const minify = () => {
         setIndentSize(0);
@@ -116,6 +107,7 @@ export default function JsonTool() {
                                         onClick={() => setInput('')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Clear"
+                                        aria-label="Clear"
                                     >
                                         <Trash2 size={16} />
                                     </motion.button>
@@ -125,6 +117,7 @@ export default function JsonTool() {
                                         onClick={() => handleCopy(input, 'input')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'input' ? (
@@ -168,6 +161,7 @@ export default function JsonTool() {
                                         onClick={() => handleCopy(output, 'output')}
                                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                                         title="Copy"
+                                        aria-label="Copy"
                                     >
                                         <AnimatePresence mode="wait">
                                             {copied === 'output' ? (

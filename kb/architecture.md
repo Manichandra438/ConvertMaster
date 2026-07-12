@@ -1,7 +1,7 @@
 ---
 project: ConvertMaster
 confidence: medium
-last-verified: 2026-07-12
+last-verified: 2026-07-12 (23:10 update)
 status: active
 ---
 
@@ -19,6 +19,9 @@ Static SPA of 8 browser-only conversion/dev tools (Base64, URL, JSON, JWT, HTML 
 - `src/pages/*.jsx` — one file per tool, self-contained (state + conversion logic + UI in the same file, no shared tool-logic layer).
 - `src/config.js` — small central config object (currently just `walkingCharacters` feature flag + speeds).
 - `src/lib/utils.js` — just `cn()` (clsx + tailwind-merge), standard shadcn-style helper.
+- `src/lib/useCopy.js` — shared clipboard hook (`{ copied, copy }`), used by all 5 text tools (Base64/URL/JSON/JWT/HTML). Extracted 2026-07-12 from 5x-duplicated `handleCopy` functions.
+- `src/lib/fileHelpers.js` — shared `sleep`/`formatBytes`/`triggerDownload`, used by all 3 file tools (ImageConverter/PdfTool/ResizeCompress). Extracted 2026-07-12 from 3x-duplicated copies.
+- `src/lib/mime.js`, `src/lib/jwt.js`, `src/lib/resize.js` — pure logic extracted out of Base64Tool/JwtTool/ResizeCompressTool respectively, specifically so it's unit-testable (each has a matching `.test.js`).
 
 ## Data flow
 User picks a tool from Sidebar → route renders the tool's page component → page manages its own local state (useState) → conversion happens synchronously or via FileReader/Canvas/pdf-lib callbacks, all in-browser → output shown in textarea/preview/downloadable Blob via `URL.createObjectURL` + synthetic `<a download>` click. No global state store, no API layer — every tool page is an island.
@@ -34,7 +37,9 @@ User picks a tool from Sidebar → route renders the tool's page component → p
 ## Entry points
 - Dev: `npm run dev` (Vite dev server)
 - Build: `npm run build` → `dist/`
-- Deploy: GitHub Actions workflow `.github/workflows/*.yml`, manual `workflow_dispatch` picking branch (master/main/Ads), `npm ci --legacy-peer-deps` (needed for React 19 peer-dep conflicts) → `npm run build` → upload `dist/` to GitHub Pages.
+- Test: `npm run test` (Vitest, added 2026-07-12 — see [[patterns]] Testing approach)
+- Deploy: `.github/workflows/deploy.yml`. As of 2026-07-12: two jobs — `lint-and-test` runs on every push/PR (lint + test), `build-and-deploy` (`needs: lint-and-test`) still only fires on manual `workflow_dispatch` picking branch (master/main/Ads). `npm ci --legacy-peer-deps` required (React 19 peer-dep conflicts) → `npm run build` → upload `dist/` to GitHub Pages.
+  - **Caveat:** the lint step in `lint-and-test` currently fails (23 pre-existing errors, mostly a `no-unused-vars`-on-JSX config gap — see [[anti-patterns]]) — CI will show red until that's fixed separately.
 
 ## Cross-links
 [[patterns]], [[anti-patterns]]

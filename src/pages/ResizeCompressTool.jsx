@@ -4,16 +4,10 @@ import { Trash2, Download, X, Image as ImageIcon } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { sleep, formatBytes, triggerDownload } from '../lib/fileHelpers';
+import { computeResizedDimensions } from '../lib/resize';
 
 // ── helpers ──────────────────────────────────────────────────
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function formatBytes(b) {
-    if (b < 1024) return b + ' B';
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-    return (b / 1024 / 1024).toFixed(2) + ' MB';
-}
-
 function readFileAsDataUrl(file) {
     return new Promise((res, rej) => {
         const r = new FileReader();
@@ -44,16 +38,7 @@ async function resizeImage(file, mode, format, quality, opts) {
         const img = new Image();
         img.onload = () => {
             try {
-                let w = img.naturalWidth, h = img.naturalHeight;
-                if (mode === 'exact') {
-                    const tw = opts.width || w;
-                    const th = opts.height;
-                    w = tw;
-                    h = th ? th : Math.round(h * (tw / img.naturalWidth));
-                } else if (mode === 'percent') {
-                    const pct = opts.percent / 100;
-                    w = Math.round(w * pct); h = Math.round(h * pct);
-                }
+                const { width: w, height: h } = computeResizedDimensions(mode, img.naturalWidth, img.naturalHeight, opts);
                 const canvas = document.createElement('canvas');
                 canvas.width = w; canvas.height = h;
                 const ctx = canvas.getContext('2d');
@@ -78,14 +63,6 @@ async function compressToSize(file, maxBytes, format) {
         blob = await imageToBlob(file, format, q);
     }
     return blob;
-}
-
-function triggerDownload(blob, name) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none'; a.href = url; a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
 }
 
 const FORMAT_EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -195,6 +172,10 @@ export default function ResizeCompressTool() {
                     onDragLeave={() => setDragging(false)}
                     onDrop={handleDrop}
                     onClick={() => inputRef.current?.click()}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Choose images to upload"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
                 >
                     <input ref={inputRef} type="file" accept="image/*" multiple onChange={(e) => addFiles(e.target.files)} />
                     <div className="text-4xl mb-3">📐</div>
@@ -280,11 +261,11 @@ export default function ResizeCompressTool() {
                                         item.status === 'error' && 'ft-status-error',
                                     )}>{item.status}</span>
                                     {item.result && (
-                                        <button onClick={() => downloadSingle(item)} className="p-1.5 hover:bg-accent rounded-md" title="Download">
+                                        <button onClick={() => downloadSingle(item)} className="p-1.5 hover:bg-accent rounded-md" title="Download" aria-label="Download">
                                             <Download size={16} />
                                         </button>
                                     )}
-                                    <button onClick={() => removeFile(item.id)} className="p-1.5 hover:bg-accent rounded-md text-muted-foreground">
+                                    <button onClick={() => removeFile(item.id)} className="p-1.5 hover:bg-accent rounded-md text-muted-foreground" title="Remove" aria-label="Remove">
                                         <X size={16} />
                                     </button>
                                 </div>

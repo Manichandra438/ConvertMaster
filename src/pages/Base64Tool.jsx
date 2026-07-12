@@ -4,10 +4,12 @@ import { Copy, Trash2, Upload, Download, ExternalLink, FileText, Image as ImageI
 import ToolCard from '../components/ToolCard';
 import SEO from '../components/SEO';
 import { cn } from '../lib/utils';
+import { useCopy } from '../lib/useCopy';
+import { getMimeTypeFromBytes } from '../lib/mime';
 
 export default function Base64Tool() {
   const [activeTab, setActiveTab] = useState('text'); // 'text' or 'file'
-  const [copied, setCopied] = useState(null); // Track which element was copied
+  const { copied, copy: handleCopy } = useCopy();
 
   // Text Mode State
   const [textInput, setTextInput] = useState('');
@@ -76,19 +78,6 @@ export default function Base64Tool() {
     }
   }, []);
 
-  // --- File Mode Logic: Base64 -> File ---
-  const getMimeTypeFromBytes = (arr) => {
-    const header = arr.subarray(0, 4).reduce((acc, byte) => acc + byte.toString(16).padStart(2, '0'), '').toUpperCase();
-    if (header.startsWith('89504E47')) return 'image/png';
-    if (header.startsWith('FFD8FF')) return 'image/jpeg';
-    if (header.startsWith('47494638')) return 'image/gif';
-    if (header.startsWith('25504446')) return 'application/pdf';
-    if (header.startsWith('504B0304')) return 'application/zip';
-    if (header.startsWith('424D')) return 'image/bmp';
-    if (header.startsWith('52494646') && arr.subarray(8, 12).reduce((acc, byte) => acc + byte.toString(16).padStart(2, '0'), '').toUpperCase() === '57454250') return 'image/webp';
-    return '';
-  };
-
   useEffect(() => {
     setFileDecodeError(null);
     setDecodedFileBlob(null);
@@ -138,16 +127,6 @@ export default function Base64Tool() {
     };
   }, [decodedFilePreviewUrl]);
 
-
-  const handleCopy = async (text, id) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(id);
-      setTimeout(() => setCopied(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
 
   const downloadDecodedFile = () => {
     if (!decodedFileBlob) return;
@@ -274,6 +253,7 @@ export default function Base64Tool() {
                         onClick={() => setTextInput('')}
                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                         title="Clear"
+                        aria-label="Clear"
                       >
                         <Trash2 size={16} />
                       </motion.button>
@@ -283,6 +263,7 @@ export default function Base64Tool() {
                         onClick={() => handleCopy(textInput, 'input')}
                         className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                         title="Copy"
+                        aria-label="Copy"
                       >
                         <AnimatePresence mode="wait">
                           {copied === 'input' ? (
@@ -325,6 +306,7 @@ export default function Base64Tool() {
                       onClick={() => handleCopy(textOutput, 'output')}
                       className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-colors"
                       title="Copy"
+                        aria-label="Copy"
                     >
                       <AnimatePresence mode="wait">
                         {copied === 'output' ? (
@@ -409,6 +391,10 @@ export default function Base64Tool() {
                     "h-48 flex flex-col items-center justify-center gap-3"
                   )}
                   onClick={() => document.getElementById('file-upload').click()}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Choose a file to upload"
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('file-upload').click(); } }}
                 >
                   <input
                     id="file-upload"
@@ -457,6 +443,8 @@ export default function Base64Tool() {
                         whileTap={{ scale: 0.9 }}
                         onClick={() => { setFileToEncode(null); setEncodedFileBase64(''); }}
                         className="p-1.5 hover:bg-background rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                        title="Remove"
+                        aria-label="Remove"
                       >
                         <Trash2 size={16} />
                       </motion.button>
@@ -475,6 +463,7 @@ export default function Base64Tool() {
                       disabled={!encodedFileBase64}
                       className="p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
                       title="Copy"
+                        aria-label="Copy"
                     >
                       <AnimatePresence mode="wait">
                         {copied === 'fileOutput' ? (
