@@ -57,6 +57,15 @@ by temporarily monkey-patching `input.click` to a no-op before dispatching a `Ke
   screenshot taken too soon. If a screenshot looks empty/washed-out right after a click or
   navigate, wait ~1s and re-screenshot, or check the DOM directly via `javascript_tool`
   (`getBoundingClientRect`/`getComputedStyle`) before concluding something failed to render.
+  Clicks issued in that same window can also miss their target — retry the click, don't just
+  retry the screenshot.
+- **Vite HMR breaks when a component's hook count/order changes mid-session** (e.g. editing a
+  file to add/remove a `useState`/`useMemo`/`useEffect` while a browser tab still has the old
+  version mounted) — confirmed root cause of a "Maximum update depth exceeded" crash + a
+  `ReferenceError: <var> is not defined` seen in this repo after refactoring `useEffect`+`setState`
+  into `useMemo` in several tool pages without reloading the tab first. **If you edit a component's
+  hooks while a tab is open, hard-reload that tab (`ctrl+shift+r` or re-navigate) before trusting
+  any error you see** — don't diagnose it as an app bug until you've done that.
 
 ## Useful flows to drive
 

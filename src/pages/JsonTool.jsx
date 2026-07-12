@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Trash2, Minimize2, Maximize2, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
@@ -8,23 +8,16 @@ import { useCopy } from '../lib/useCopy';
 
 export default function JsonTool() {
     const [input, setInput] = useState('');
-    const [output, setOutput] = useState('');
-    const [error, setError] = useState(null);
     const [indentSize, setIndentSize] = useState(2);
     const { copied, copy: handleCopy } = useCopy();
 
-    useEffect(() => {
-        setError(null);
-        if (!input) {
-            setOutput('');
-            return;
-        }
-
+    const { output, error } = useMemo(() => {
+        if (!input) return { output: '', error: null };
         try {
             const parsed = JSON.parse(input);
-            setOutput(JSON.stringify(parsed, null, indentSize));
+            return { output: JSON.stringify(parsed, null, indentSize), error: null };
         } catch (err) {
-            setError(err.message);
+            return { output: '', error: err.message };
         }
     }, [input, indentSize]);
 

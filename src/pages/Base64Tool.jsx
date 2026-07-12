@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Trash2, Upload, Download, ExternalLink, FileText, Image as ImageIcon, File, Type, Check } from 'lucide-react';
 import ToolCard from '../components/ToolCard';
@@ -13,9 +13,7 @@ export default function Base64Tool() {
 
   // Text Mode State
   const [textInput, setTextInput] = useState('');
-  const [textOutput, setTextOutput] = useState('');
   const [textMode, setTextMode] = useState('encode'); // 'encode' or 'decode'
-  const [textError, setTextError] = useState(null);
 
   // File Mode State
   // Left Side (File -> Base64)
@@ -31,20 +29,15 @@ export default function Base64Tool() {
   const [fileDecodeError, setFileDecodeError] = useState(null);
 
   // --- Text Mode Logic ---
-  useEffect(() => {
-    setTextError(null);
-    if (!textInput) {
-      setTextOutput('');
-      return;
-    }
+  // Pure derivation of textInput/textMode — computed during render, not an effect.
+  const { textOutput, textError } = useMemo(() => {
+    if (!textInput) return { textOutput: '', textError: null };
     try {
-      if (textMode === 'encode') {
-        setTextOutput(btoa(textInput));
-      } else {
-        setTextOutput(atob(textInput));
-      }
+      const output = textMode === 'encode' ? btoa(textInput) : atob(textInput);
+      return { textOutput: output, textError: null };
     } catch (err) {
-      setTextError('Invalid input for ' + textMode);
+      console.error('Base64 ' + textMode + ' failed:', err);
+      return { textOutput: '', textError: 'Invalid input for ' + textMode };
     }
   }, [textInput, textMode]);
 
@@ -79,6 +72,9 @@ export default function Base64Tool() {
   }, []);
 
   useEffect(() => {
+    // Genuine side effect (creates a Blob + object URL below, cleaned up by the
+    // next effect) — not a pure render derivation, so it stays an effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFileDecodeError(null);
     setDecodedFileBlob(null);
     setDecodedFilePreviewUrl('');
@@ -116,6 +112,7 @@ export default function Base64Tool() {
       setDecodedFilePreviewUrl(URL.createObjectURL(blob));
 
     } catch (err) {
+      console.error('Base64 to file decode failed:', err);
       setFileDecodeError('Invalid Base64 string');
     }
   }, [base64ToFileInput]);

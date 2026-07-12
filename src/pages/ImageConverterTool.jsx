@@ -122,6 +122,7 @@ export default function ImageConverterTool() {
                 const blob = await imageToFormat(updated[i].file, format, quality / 100, colorMode);
                 updated[i] = { ...updated[i], result: blob, status: 'done' };
             } catch (e) {
+                console.error('Image conversion failed:', e);
                 updated[i] = { ...updated[i], status: 'error' };
             }
             setFiles([...updated]);

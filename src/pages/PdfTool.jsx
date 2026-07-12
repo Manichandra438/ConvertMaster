@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Download, X, FileText, RefreshCw } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
